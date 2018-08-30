@@ -1,0 +1,35 @@
+exec: hpxic --input= --output= --worldSize=256x512x256 --blockSize= --numSeeds= --seedSet= --stepSize= --numMaxSteps= --distributeBlocks=
+
+parameters:
+  - input: "2470.nrrd"
+  - output: "%J.out"
+  - blockSize: 
+      - mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
+      - val: [2, 4]
+  - numSeeds: [10,200]
+  - seedSet: {1,3}
+  - stepSize:
+      - python: "[x/10 for x in range(1,10)]" # python executes evals following string
+  - numMaxSteps: 1000
+  - distributeBlocks: simple
+
+scheduler:
+  - type: slurm
+  - retry: true
+  - retry-time: 00:30:00
+  - retry-count: 2
+
+  - account: "tukl-taskis"
+  - constraint: "XEON_E5_2640v3,IB"
+  - ntasks-per-node: 1
+  - cpus-per-task: 16
+  - mem:
+    - mask: ?G
+    - val: [32,64]
+  - time: 1:00:00
+  - nodes:
+    - python: "[1<<exponent for exponent in range(7)]"
+  - mail-type: "NONE"
+  - body:|
+        set -eo pipefail -o nounset
+        echo "blabla"
