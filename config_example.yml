@@ -25,11 +25,11 @@ scheduler:
   - cpus-per-task: 16
   - mem:
     - mask: ?G
-    - val: [32,64]
+    - val: {32,33,64}
   - time: 1:00:00
   - nodes:
     - python: "[1<<exponent for exponent in range(7)]"
   - mail-type: "NONE"
-  - body:|
-        set -eo pipefail -o nounset
-        echo "blabla"
+  - body: |
+          set -eo pipefail -o nounset
+          echo "blabla"
