@@ -110,28 +110,11 @@ def make_list(element):
             make_list(e)
 
 
-# https://stackoverflow.com/questions/50606454/cartesian-product-of-nested-dictionaries-of-lists
 def gen_combinations(d):
     keys, values = d.keys(), d.values()
-    combinations = itertools.product(*values)
-
-    for c in combinations:
-        yield dict(zip(keys, c))
-
-
-def gen_dict_combinations(d):
-    keys, values = d.keys(), d.values()
-    for c in itertools.product(*(gen_combinations(v) for v in values)):
-        yield dict(zip(keys, c))
-
-
-# https://stackoverflow.com/questions/5228158/cartesian-product-of-a-dictionary-of-lists
-# def product_dict(**kwargs):
-#     keys = kwargs.keys()
-#     vals = kwargs.values()
-#     for instance in itertools.product(*vals):
-#         yield dict(zip(keys, instance))
-# print(list(product_dict(**config))[0])
+    values_choices = (gen_combinations(v) if isinstance(v, dict) else v for v in values)
+    for comb in itertools.product(*values_choices):
+        yield dict(zip(keys, comb))
 
 
 def parseConfig(filename: str) -> list:
@@ -150,29 +133,20 @@ def parseConfig(filename: str) -> list:
     resolve_sequences(config)
 
     # Join all dict into one
-    config['parameters'] = dict(pair for d in config['parameters'] for pair in d.items())
+    config['exec'] = dict(pair for d in config['exec'] for pair in d.items())
+    config['exec']['parameters'] = dict(pair for d in config['exec']['parameters'] for pair in d.items())
     config['scheduler'] = dict(pair for d in config['scheduler'] for pair in d.items())
+    config['scheduler']['parameters'] = dict(pair for d in config['scheduler']['parameters'] for pair in d.items())
 
     make_list(config)
 
-    # Needed because gen_dict_combinations expects nested dict
-    config['exec'] = {'call': config['exec']}
-
     logger.info("Generating configurations..")
 
-    job_configurations = list(gen_dict_combinations(config))
+    job_configurations = list(gen_combinations(config))
 
     logger.info("#Configurations: " + str(len(job_configurations)))
 
+    if len(job_configurations) > 100:
+        logger.warning("Large number of configurations generated!!")
+
     return job_configurations
-
-
-
-
-
-
-
-
-
-
-
