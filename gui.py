@@ -1,19 +1,22 @@
 import urwid
 from widget_file_browser import *
+from benchmark import Benchmark
 import logging
+import datetime
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s [%(levelname)-2s %(filename)s:%(lineno)s - %(funcName)5s()] %(message)s")
 
 logger = logging.getLogger('gui')
 
-# def callback(key):
-#     if key == 'q':
-#         raise urwid.ExitMainLoop()
-#     if key == 'o':
-#         urwid.main_loop.widget = urwid.Overlay(DirectoryBrowser(), urwid.main_loop.widget)
+update_intervall = 10
+
 
 class SelectableText(urwid.Text):
+    def __init__(self, text, data=None):
+        self.__super.__init__(text)
+        self.data = data
+
     def selectable(self):
         return True
 
@@ -41,22 +44,38 @@ palette = [
 class MainWidget(urwid.WidgetWrap):
     def __init__(self):
         self.content = urwid.SimpleListWalker([
-        urwid.AttrMap(SelectableText('-- example_config.ymal ----'), 'asd',  'reveal focus'),
-        urwid.AttrMap(SelectableText('bar'), '',  'reveal focus'),
-        urwid.AttrMap(SelectableText('baz'), '',  'reveal focus'),
+        # urwid.AttrMap(SelectableText('-- example_config.ymal ----'), 'asd',  'reveal focus'),
+        # urwid.AttrMap(SelectableText('bar'), '',  'reveal focus'),
+        # urwid.AttrMap(SelectableText('baz'), '',  'reveal focus'),
         ])
 
-        self.header = urwid.Text("Cluster Job Monitor v0.1")
-        self.footer = urwid.Text("Footer")
+        self.header_prefix = "Cluster Job Monitor v0.1"
+        self.header = urwid.Text(self.header_prefix)
+        self.footer = urwid.Text("Status")
 
-        super(MainWidget, self).__init__(urwid.Frame(urwid.LineBox(urwid.ListBox(self.content)), header=self.header, footer=self.footer))
+        self.list = urwid.ListBox(self.content)
+
+        super(MainWidget, self).__init__(urwid.Frame(urwid.LineBox(self.list), header=self.header, footer=self.footer))
+
+    def add_line(self, text: str, data):
+        self.content.append(urwid.AttrMap(SelectableText(text, data), '',  'reveal focus'))
 
     def update(self, main_loop, user_data):
-        self.content.append(urwid.AttrMap(SelectableText('NEEEEEWWW'), '',  'reveal focus'))
+        self.header.set_text(self.header_prefix + "    Last Update: " + datetime.datetime.now().time().strftime("%H:%M:%S"))
+        main_loop.set_alarm_in(update_intervall, self.update, user_data=[])
 
-    def setFooter(self, text):
+    def set_footer(self, text: str):
         self.footer.set_text(text)
 
+    def keypress(self, size, key):
+        key = self.__super.keypress(size, key)
+        if key == 'r':
+            element = self._w.contents['body'][0]._w.get_focus_widgets()[-1]._get_base_widget()
+            if type(element) is SelectableText:
+                self.set_footer("Running " + str(len(element.data.configurations)) + " Jobs of config: " + element.data.file)
+
+        else:
+            return key
 
 
 class JobMonitor(object):
@@ -64,6 +83,13 @@ class JobMonitor(object):
         self.top = MainWidget()
         self.back = None
         self.modus = 'main'
+        self.benchmarks = []
+
+    def addConfig(self, file):
+        bench = Benchmark(file)
+        self.benchmarks.append(bench)
+        self.top.set_footer(file)
+        self.top.add_line(file + " #Configurations: " + str(len(self.benchmarks[-1].configurations)), bench)
 
     def callback(self, key):
         if key == 'q':
@@ -80,11 +106,11 @@ class JobMonitor(object):
                 # Terminate browsing and switch back to main
                 self.top._w.contents['body'] = (self.back, None)
                 names = [escape_filename_sh(x) for x in get_flagged_names()]
-                self.top.setFooter(names[0])
-
+                for file in names:
+                    self.addConfig(file.replace('"', ''))
 
 
 main = JobMonitor()
 mainloop = urwid.MainLoop(main.top, unhandled_input=main.callback, palette=palette)
-# handle = mainloop.set_alarm_in(2, main.top.update, user_data=[])
+handle = mainloop.set_alarm_in(update_intervall, main.top.update, user_data=[])
 mainloop.run()

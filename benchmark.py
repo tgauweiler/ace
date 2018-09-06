@@ -15,7 +15,8 @@ coloredlogs.install(level='DEBUG')
 
 class Benchmark(object):
     def __init__(self, file):
-        self.configurations = self.configurations = getConfigs.parseConfig(file)
+        self.file = file
+        self.configurations = getConfigs.parseConfig(file)
 
     def run(self):
         scheduleJob.schedule(self.configurations[0])

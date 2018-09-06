@@ -36,7 +36,6 @@ def schedule(config: dict):
     body += call
 
     config['scheduler']['jobid'] = job.run(body, _cmd="cat")
-    print(config['scheduler']['jobid'])
 
 
 def get_job_info(jobid: str) -> list:
