@@ -1,4 +1,5 @@
 import logging
+import coloredlogs
 import getConfigs
 import scheduleJob
 
@@ -9,14 +10,18 @@ logging.getLogger('getConfigs').setLevel(logging.INFO)
 logging.getLogger('scheduleJob').setLevel(logging.DEBUG)
 
 logger = logging.getLogger('runBenchmark')
+coloredlogs.install(level='DEBUG')
 
 
 class Benchmark(object):
     def __init__(self, file):
-        self.configurations = self.configurations = getConfigs.parseConfig('config_example.yml')
+        self.configurations = self.configurations = getConfigs.parseConfig(file)
 
     def run(self):
         scheduleJob.schedule(self.configurations[0])
 
 
+if __name__ == "__main__":
+    test = Benchmark('config_example.yml')
+    test.run()
 
