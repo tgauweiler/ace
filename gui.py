@@ -60,9 +60,27 @@ class MainWidget(urwid.WidgetWrap):
     def add_line(self, text: str, data):
         self.content.append(urwid.AttrMap(SelectableText(text, data), '',  'reveal focus'))
 
-    def update(self, main_loop, user_data):
+    def update_lines(self):
         self.header.set_text(self.header_prefix + "    Last Update: " + datetime.datetime.now().time().strftime("%H:%M:%S"))
-        main_loop.set_alarm_in(update_intervall, self.update, user_data=[])
+        # TODO: Loop over all entries and if its a job update its status and text
+        for line in self.list.body:
+            line_widget = line._get_base_widget()
+
+            if type(line_widget.data) is Benchmark:
+                for job in line_widget.data.configurations:
+
+                    if 'widget' not in job and 'jobid' in job:
+                        # Case that job got scheduled but doesnt have a line widget yet
+                        job['widget'] = urwid.AttrMap(SelectableText(str(job['jobid']), job), '', 'reveal focus')
+                        self.content.append(job['widget'])
+
+            # self.set_footer(str(line._get_base_widget()))
+
+    def update(self, main_loop, user_data):
+        self.update_lines()
+
+        if user_data:
+            main_loop.set_alarm_in(update_intervall, self.update, user_data=True)
 
     def set_footer(self, text: str):
         self.footer.set_text(text)
@@ -71,8 +89,10 @@ class MainWidget(urwid.WidgetWrap):
         key = self.__super.keypress(size, key)
         if key == 'r':
             element = self._w.contents['body'][0]._w.get_focus_widgets()[-1]._get_base_widget()
-            if type(element) is SelectableText:
+            if type(element) is SelectableText and type(element.data) is Benchmark:
                 self.set_footer("Running " + str(len(element.data.configurations)) + " Jobs of config: " + element.data.file)
+                element.data.run()
+                self.update_lines()
 
         else:
             return key
@@ -108,9 +128,10 @@ class JobMonitor(object):
                 names = [escape_filename_sh(x) for x in get_flagged_names()]
                 for file in names:
                     self.addConfig(file.replace('"', ''))
+                self.modus = 'main'
 
 
 main = JobMonitor()
 mainloop = urwid.MainLoop(main.top, unhandled_input=main.callback, palette=palette)
-handle = mainloop.set_alarm_in(update_intervall, main.top.update, user_data=[])
+handle = mainloop.set_alarm_in(update_intervall, main.top.update, user_data=True)
 mainloop.run()

@@ -35,8 +35,7 @@ def schedule(config: dict):
     logger.debug(call)
     body += call
 
-    config['scheduler']['jobid'] = job.run(body, _cmd="cat")
-
+    config['jobid'] = 1 #job.run(body, _cmd="cat")
 
 def get_job_info(jobid: str) -> list:
     if pyslurm:

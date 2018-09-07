@@ -97,6 +97,22 @@ def resolve_sequences(element):
             resolve_sequences(e)
 
 
+def make_all_str(element):
+    if type(element) == dict:
+        for k, v in element.items():
+            if type(v) is dict or type(v) is list:
+                make_all_str(v)
+            else:
+                element[k] = str(v)
+
+    elif type(element) is list:
+        for i, e in enumerate(element):
+            if type(e) is dict or type(e) is list:
+                make_all_str(e)
+            else:
+                element[i] = str(e)
+
+
 def make_list(element):
     if type(element) is dict:
         for k, v in element.items():
@@ -139,10 +155,12 @@ def parseConfig(filename: str) -> list:
     config['scheduler']['parameters'] = dict(pair for d in config['scheduler']['parameters'] for pair in d.items())
 
     make_list(config)
+    make_all_str(config)
 
     logger.info("Generating configurations..")
 
     job_configurations = list(gen_combinations(config))
+
 
     logger.info("#Configurations: " + str(len(job_configurations)))
 
