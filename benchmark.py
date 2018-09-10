@@ -21,7 +21,13 @@ class Benchmark(object):
         self.configurations = getConfigs.parseConfig(file)
 
     def run(self):
-        scheduleJob.schedule(self.configurations[0])
+        for config in self.configurations:
+            scheduleJob.schedule(config)
+
+    def update(self):
+        # Update all job information
+        for config in self.configurations:
+            scheduleJob.get_job_info(config)
 
 
 if __name__ == "__main__":

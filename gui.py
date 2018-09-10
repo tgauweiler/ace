@@ -60,6 +60,9 @@ class MainWidget(urwid.WidgetWrap):
     def add_line(self, text: str, data):
         self.content.append(urwid.AttrMap(SelectableText(text, data), '',  'reveal focus'))
 
+    def get_job_line(self, job):
+        return str(job['jobid']) + " " + str(job['status']['job_state'])
+
     def update_lines(self):
         self.header.set_text(self.header_prefix + "    Last Update: " + datetime.datetime.now().time().strftime("%H:%M:%S"))
         # TODO: Loop over all entries and if its a job update its status and text
@@ -67,18 +70,20 @@ class MainWidget(urwid.WidgetWrap):
             line_widget = line._get_base_widget()
 
             if type(line_widget.data) is Benchmark:
+                line_widget.data.update()  # Get all job status from slurm
                 for job in line_widget.data.configurations:
 
                     if 'widget' not in job and 'jobid' in job:
                         # Case that job got scheduled but doesnt have a line widget yet
-                        job['widget'] = urwid.AttrMap(SelectableText(str(job['jobid']), job), '', 'reveal focus')
+                        job['widget'] = urwid.AttrMap(SelectableText(self.get_job_line(job), job), '', 'reveal focus')
                         self.content.append(job['widget'])
+                    elif 'widget' in job and 'jobid' in job:
+                        # Update job information
+                        job['widget'].original_widget.set_text(self.get_job_line(job))
 
-            # self.set_footer(str(line._get_base_widget()))
-
-    def update(self, main_loop, user_data):
+    def update(self, main_loop: urwid.main_loop, user_data):
         self.update_lines()
-
+        main_loop.draw_screen()
         if user_data:
             main_loop.set_alarm_in(update_intervall, self.update, user_data=True)
 
@@ -93,6 +98,7 @@ class MainWidget(urwid.WidgetWrap):
                 self.set_footer("Running " + str(len(element.data.configurations)) + " Jobs of config: " + element.data.file)
                 element.data.run()
                 self.update_lines()
+                self.set_footer("")
 
         else:
             return key

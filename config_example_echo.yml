@@ -1,5 +1,5 @@
 exec:
-  - call: hpxic --input= --output= --worldSize=256x512x256 --blockSize= --numSeeds= --seedSet= --stepSize= --numMaxSteps= --distributeBlocks=
+  - call: echo --input= --output= --worldSize=256x512x256 --blockSize= --numSeeds= --seedSet= --stepSize= --numMaxSteps= --distributeBlocks=
 
   - parameters:
     - input: "2470.nrrd"
@@ -7,10 +7,9 @@ exec:
     - blockSize: 
         - mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
         - val: [2, 4]
-    - numSeeds: [10,200]
-    - seedSet: {1,3}
-    - stepSize:
-        - python: "[x/10 for x in range(1,10)]" # python executes evals following string
+    - numSeeds: 10
+    - seedSet: 1
+    - stepSize: 0.1
     - numMaxSteps: 1000
     - distributeBlocks: simple
 
@@ -25,12 +24,9 @@ scheduler:
     - constraint: "XEON_E5_2640v3,IB"
     - ntasks-per-node: 1
     - cpus-per-task: 16
-    - mem:
-      - mask: ?G
-      - val: {32,33,64}
+    - mem: 1G
     - time: 1:00:00
-    - nodes:
-      - python: "[1<<exponent for exponent in range(7)]"
+    - nodes: 1
     - mail-type: "NONE"
     - body: |
             set -eo pipefail -o nounset
