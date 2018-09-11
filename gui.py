@@ -65,21 +65,26 @@ class MainWidget(urwid.WidgetWrap):
 
     def update_lines(self):
         self.header.set_text(self.header_prefix + "    Last Update: " + datetime.datetime.now().time().strftime("%H:%M:%S"))
-        # TODO: Loop over all entries and if its a job update its status and text
+
         for line in self.list.body:
             line_widget = line._get_base_widget()
 
             if type(line_widget.data) is Benchmark:
                 line_widget.data.update()  # Get all job status from slurm
                 for job in line_widget.data.configurations:
-
+                    # Update line text of each job
                     if 'widget' not in job and 'jobid' in job:
                         # Case that job got scheduled but doesnt have a line widget yet
                         job['widget'] = urwid.AttrMap(SelectableText(self.get_job_line(job), job), '', 'reveal focus')
                         self.content.append(job['widget'])
                     elif 'widget' in job and 'jobid' in job:
-                        # Update job information
+                        # Update line widget text
                         job['widget'].original_widget.set_text(self.get_job_line(job))
+
+                # Check all jobs status code for error
+                line_widget.data.check_jobs()
+
+
 
     def update(self, main_loop: urwid.main_loop, user_data):
         self.update_lines()

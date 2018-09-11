@@ -39,6 +39,6 @@ def schedule(config: dict):
 
 
 def get_job_info(config: dict):
-    if pyslurm:
+    if pyslurm and 'jobid' in config:
         job = pyslurm.job()
         config['status'] = job.find_id(config['jobid'])[0]
