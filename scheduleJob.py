@@ -50,7 +50,7 @@ def schedule(config: dict):
         logger.warning("auto_args environment variable already set!")
     env_vars.append("auto_args=" + " ".join(auto_args))
 
-    body = "\n".join(env_vars) + body
+    body = "\n".join(env_vars) + "\n\n" + body
     config['jobid'] = job.run(body)
 
 

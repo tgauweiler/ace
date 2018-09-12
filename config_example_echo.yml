@@ -1,33 +1,31 @@
-exec:
-  - call: echo --input= --output= --worldSize=256x512x256 --blockSize= --numSeeds= --seedSet= --stepSize= --numMaxSteps= --distributeBlocks=
+script:
+  body: |
+         echo ${auto_args}
 
-  - parameters:
-    - input: "2470.nrrd"
-    - output: "%J.out"
-    - blockSize: 
-        - mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
-        - val: [2, 4]
-    - numSeeds: 10
-    - seedSet: 1
-    - stepSize: 0.1
-    - numMaxSteps: 1000
-    - distributeBlocks: simple
+  parameters:
+    input: "2470.nrrd"
+    output: "%J.out"
+    blockSize: 
+        mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
+        values: [2, 4]
+    numSeeds: 10
+    seedSet: 1
+    stepSize: 0.1
+    numMaxSteps: 1000
+    distributeBlocks: simple
 
 scheduler:
-  - type: slurm
-  - retry: true
-  - retry-time: 00:30:00
-  - retry-count: 2
+  type: slurm
+  retry: true
+  retry-time: 00:30:00
+  retry-count: 2
 
-  - parameters:
-    - account: "tukl-taskvis"
-    - constraint: "XEON_E5_2640v3,IB"
-    - ntasks-per-node: 1
-    - cpus-per-task: 16
-    - mem: 1G
-    - time: 1:00:00
-    - nodes: 1
-    - mail-type: "NONE"
-    - body: |
-            set -eo pipefail -o nounset
-            echo "blabla"
+  parameters:
+    account: "tukl-taskvis"
+    constraint: "XEON_E5_2640v3,IB"
+    ntasks-per-node: 1
+    cpus-per-task: 16
+    mem: 1G
+    time: 1:00:00
+    nodes: 1
+    mail-type: "NONE"
