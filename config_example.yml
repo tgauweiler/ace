@@ -1,37 +1,55 @@
-exec:
-  - call: hpxic --input= --output= --worldSize=256x512x256 --blockSize= --numSeeds= --seedSet= --stepSize= --numMaxSteps= --distributeBlocks=
+script: 
+  body: |
+    # copy data file to local machine
+    sbcast ${SCRATCH}/data-${worldSize}.nrrd /tmp
 
-  - parameters:
-    - input: "2470.nrrd"
-    - output: "%J.out"
-    - blockSize: 
-        - mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
-        - val: [2, 4]
-    - numSeeds: [10,200]
-    - seedSet: {1,3}
-    - stepSize:
-        - python: "[x/10 for x in range(1,10)]" # python executes evals following string
-    - numMaxSteps: 1000
-    - distributeBlocks: simple
+    # run benchmark
+    mpirun vampirtrace --tf /tmp/trace-${jobid} -- hpxic -hpx:print-config ${auto_args}
+
+    # copy trace file to scratch
+    gzip -9 /tmp/trace-${jobid}
+    mv /tmp/trace-${jobid} ${SCRATCH}/traces/
+
+
+  parameters:
+      jobid: "${SLURM_JOB_ID}"
+      worldSize:
+          noauto: true
+          values: [128x128x128, 256x256x256]
+      blockSize:
+          mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
+          values: [2,4]
+      numSeeds: [10,200]
+      seedSet: [1,3]
+      stepSize:
+          eval: "[x/10 for x in range(1,10)]" # python executes evals following string
+      numMaxSteps: 1000
+      distributeBlocks: simple
+      input: /tmp/data-${worldSize}.nrrd
+      output: /tmp/${jobid}.out
+
 
 scheduler:
-  - type: slurm
-  - retry: true
-  - retry-time: 00:30:00
-  - retry-count: 2
+    type: slurm
+    retry: true
+    retry-time: 00:30:00
+    retry-count: 2
+    host:
+      'elwe':
+          parameters:
+            constraint: "XEON_E5_2640v3,IB"
+      'minion':
+          parameters:
+            nodes: [1, 2, 3, 4, 5]
 
-  - parameters:
-    - account: "tukl-taskvis"
-    - constraint: "XEON_E5_2640v3,IB"
-    - ntasks-per-node: 1
-    - cpus-per-task: 16
-    - mem:
-      - mask: ?G
-      - val: {32,33,64}
-    - time: 1:00:00
-    - nodes:
-      - python: "[1<<exponent for exponent in range(7)]"
-    - mail-type: "NONE"
-    - body: |
-            set -eo pipefail -o nounset
-            echo "blabla"
+    parameters:
+      account: "tukl-taskvis"
+      mail-type: "NONE"
+      ntasks-per-node: 1
+      cpus-per-task: 16
+      mem:
+          mask: ?G
+          values: [32,33,64]
+      time: 1:00:00
+      nodes:
+          eval: "[1<<exponent for exponent in range(7)]"

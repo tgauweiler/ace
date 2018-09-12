@@ -3,12 +3,13 @@ import coloredlogs
 import getConfigs
 import scheduleJob
 import datetime
+import argparse
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s [%(levelname)-2s %(filename)s:%(lineno)s - %(funcName)5s()] %(message)s")
 
-logging.getLogger('getConfigs').setLevel(logging.WARNING)
-logging.getLogger('scheduleJob').setLevel(logging.WARNING)
+logging.getLogger('getConfigs').setLevel(logging.INFO)
+logging.getLogger('scheduleJob').setLevel(logging.INFO)
 
 logger = logging.getLogger('runBenchmark')
 coloredlogs.install(level='DEBUG')
@@ -59,12 +60,14 @@ class Benchmark(object):
 
 
 if __name__ == "__main__":
-    test = Benchmark('config_example.yml')
-    print(str(type(test.configurations)))
-    print(test.configurations[0])
-    test.run()
-    for job in test.configurations:
-        # logger.debug(str(job))
-        if 'widget' not in job and 'jobid' in job:
-            print(job)
+    parser = argparse.ArgumentParser(description="Run benchmark for config.yml")
+    parser.add_argument('config_file', metavar='file', type=str,
+                        help='path to config file')
+    args = parser.parse_args()
+    bench = Benchmark(args.config_file)
+    logger.info("Run benchmark? (ctrl-c to abort)")
+    input("")
+    for config in bench.configurations:
+        scheduleJob.schedule(config)
+
 
