@@ -40,15 +40,15 @@ def schedule(config: dict):
 
         # Set env variable
         if type(v) is dict:
-            env_vars.append(k + "=" + v['values'])
+            env_vars.append(k + "=\"" + v['values'] + "\"")
         else:
-            env_vars.append(k + "=" + v)
+            env_vars.append(k + "=\"" + v + "\"")
             auto_args.append("--" + k + "=${" + k + "}")
 
     # Create auto_args
     if 'auto_args' in os.environ:
         logger.warning("auto_args environment variable already set!")
-    env_vars.append("auto_args=" + " ".join(auto_args))
+    env_vars.append("auto_args=\"" + " ".join(auto_args) + "\"")
 
     body = "\n".join(env_vars) + "\n\n" + body
     config['jobid'] = job.run(body)
