@@ -1,6 +1,7 @@
 import logging
 import yaml
 import itertools
+from loader import load
 
 logger = logging.getLogger('getConfigs')
 
@@ -96,13 +97,8 @@ def gen_combinations(d):
 
 def parseConfig(filename: str) -> list:
     logger.info("Parsing config file: " + filename)
-    with open(filename, 'r') as stream:
-        try:
-            config = yaml.load(stream)
 
-        except yaml.YAMLError as exc:
-            print(exc)
-            raise
+    config = load(filename)
 
     resolve_python(config)
     resolve_masks(config)
