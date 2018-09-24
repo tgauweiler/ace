@@ -11,17 +11,14 @@ def merge_dicts(main: dict, second: dict):
 
 
 def load(filename: str) -> dict:
-    with open(filename) as f:
-        first_line = f.readline()
-
-        if '#include' in first_line:
-            include_filename = first_line.split(' ')[1].strip()
-            with open(include_filename, 'r') as stream:
-                try:
-                    include_configs = yaml.load(stream)
-                except yaml.YAMLError as exc:
-                    print(exc)
-                    raise
+    include_configs = dict()
+    with open(filename, 'r') as f:
+        for line in f:
+            if '#include' in line:
+                include_filename = line.split(' ')[1].strip()
+                merge_dicts(include_configs, load(include_filename))
+            else:
+                break
 
     with open(filename, 'r') as stream:
         try:
@@ -32,8 +29,8 @@ def load(filename: str) -> dict:
             raise
 
     # Merge main file with include file
-    if include_configs is not None:
-        merge_dicts(main_configs, include_configs)
+
+    merge_dicts(main_configs, include_configs)
         # main_configs = {**include_configs, **main_configs}
 
     return main_configs

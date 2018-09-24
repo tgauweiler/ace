@@ -6,7 +6,6 @@ script:
 
   parameters:
     input: "2470.nrrd"
-    output: "test"
     blockSize: 
         mask: ?x?x? # Defines as mask that is used to generate, here replace ? with elements out of range in val
         values: [2, 4]
