@@ -110,6 +110,15 @@ def parseConfig(filename: str) -> list:
 
     job_configurations = list(gen_combinations(config))
 
+    # Duplicate configs that have times set
+    new = []
+    for conf in job_configurations:
+        if 'times' in conf['scheduler']:
+            for x in range(1, int(conf['scheduler']['times'])):  # Conf exists already once
+                new.append(conf)
+
+    job_configurations.extend(new)
+
     logger.info("#Configurations: " + str(len(job_configurations)))
 
     if len(job_configurations) > 100:

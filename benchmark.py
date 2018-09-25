@@ -65,6 +65,7 @@ if __name__ == "__main__":
                         help='path to config file')
     args = parser.parse_args()
     bench = Benchmark(args.config_file)
+    
     logger.info("Run benchmark? (ctrl-c to abort)")
     input("")
     for config in bench.configurations:

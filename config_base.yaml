@@ -1,4 +1,5 @@
 script:
 
   parameters:
+    input: "2470.nrrd"
     output: "%J.out"
