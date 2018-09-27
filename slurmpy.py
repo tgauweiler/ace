@@ -60,7 +60,7 @@ class Slurm(object):
         header = []
         for k, v in slurm_kwargs.items():
             if len(k) > 1:
-                if v is None:
+                if v is None or len(v) == 0:
                     k = "--" + k
                     header.append("#SBATCH %s" % k)
                 else:
