@@ -1,2 +1,1 @@
 PyYAML==3.13
-slurmpy==0.0.7

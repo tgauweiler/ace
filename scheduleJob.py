@@ -26,7 +26,8 @@ def schedule(config: dict):
 
     # Create Slurm job script
     parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
-
+    #FIXME: Change for exclusive
+    #TODO: Add Slurmpy directly and modify source to remove print and handle key:value with value is None in a way that there is only --key without a value!!
     job = Slurm("acb", parameters)
 
     body = config['script']['body']
