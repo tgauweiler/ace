@@ -73,5 +73,6 @@ if __name__ == "__main__":
         scheduleJob.schedule(config)
         print('.', end='', flush=True)
         time.sleep(0.5)
+    print("")  # So that shell start correct
 
 
