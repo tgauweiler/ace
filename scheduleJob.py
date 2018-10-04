@@ -26,8 +26,7 @@ def schedule(config: dict):
 
     # Create Slurm job script
     parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
-    #FIXME: Change for exclusive
-    #TODO: Add Slurmpy directly and modify source to remove print and handle key:value with value is None in a way that there is only --key without a value!!
+
     job = Slurm("acb", parameters)
 
     body = config['script']['body']
@@ -49,9 +48,18 @@ def schedule(config: dict):
     # Create auto_args
     if 'auto_args' in os.environ:
         logger.warning("auto_args environment variable already set!")
+    env_vars.append("")  # Add a new line between args and auto_args
     env_vars.append("auto_args=\"" + " ".join(auto_args) + "\"")
 
-    body = "\n".join(env_vars) + "\n\n" + body
+    # Handle times keyword
+    if 'times' in config['script'] and int(config['script']['times']) > 1:
+        prefix = "for run in {1.." + config['script']['times'] + "}\ndo\n\n\n"
+        suffix = "done"
+
+    # Join body
+    body = prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix
+
+    # Schedule job script
     config['jobid'] = job.run(body)
 
 

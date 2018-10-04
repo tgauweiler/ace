@@ -4,6 +4,7 @@ import getConfigs
 import scheduleJob
 import datetime
 import argparse
+import time
 
 logging.basicConfig(level=logging.DEBUG,
                     format="%(asctime)s [%(levelname)-2s %(filename)s:%(lineno)s - %(funcName)5s()] %(message)s")
@@ -70,5 +71,7 @@ if __name__ == "__main__":
     input("")
     for config in bench.configurations:
         scheduleJob.schedule(config)
+        print('.', end='', flush=True)
+        time.sleep(0.5)
 
 
