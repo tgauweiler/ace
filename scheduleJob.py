@@ -57,7 +57,7 @@ def schedule(config: dict):
         suffix = "done"
 
     # Join body
-    body = prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix
+    body = prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix + "\n"
 
     # Schedule job script
     config['jobid'] = job.run(body)
