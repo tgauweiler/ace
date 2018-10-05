@@ -39,7 +39,6 @@ TMPL = """\
 
 {header}
 
-set -eo pipefail -o nounset
 
 __script__"""
 
