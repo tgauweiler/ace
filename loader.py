@@ -29,8 +29,6 @@ def load(filename: str) -> dict:
             raise
 
     # Merge main file with include file
-
     merge_dicts(main_configs, include_configs)
-        # main_configs = {**include_configs, **main_configs}
 
     return main_configs

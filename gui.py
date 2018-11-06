@@ -9,8 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 logger = logging.getLogger('gui')
 
-update_intervall = 10
-
+update_interval = 10
 
 class SelectableText(urwid.Text):
     def __init__(self, text, data=None):
@@ -84,13 +83,11 @@ class MainWidget(urwid.WidgetWrap):
                 # Check all jobs status code for error
                 line_widget.data.check_jobs()
 
-
-
     def update(self, main_loop: urwid.main_loop, user_data):
         self.update_lines()
         main_loop.draw_screen()
         if user_data:
-            main_loop.set_alarm_in(update_intervall, self.update, user_data=True)
+            main_loop.set_alarm_in(update_interval, self.update, user_data=True)
 
     def set_footer(self, text: str):
         self.footer.set_text(text)
@@ -144,5 +141,5 @@ class JobMonitor(object):
 
 main = JobMonitor()
 mainloop = urwid.MainLoop(main.top, unhandled_input=main.callback, palette=palette)
-handle = mainloop.set_alarm_in(update_intervall, main.top.update, user_data=True)
+handle = mainloop.set_alarm_in(update_interval, main.top.update, user_data=True)
 mainloop.run()
