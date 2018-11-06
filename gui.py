@@ -1,4 +1,3 @@
-import urwid
 from widget_file_browser import *
 from benchmark import Benchmark
 import logging
