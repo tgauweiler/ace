@@ -10,6 +10,7 @@ logger = logging.getLogger('gui')
 
 update_interval = 10
 
+
 class SelectableText(urwid.Text):
     def __init__(self, text, data=None):
         self.__super.__init__(text)
@@ -23,28 +24,28 @@ class SelectableText(urwid.Text):
 
 
 palette = [
-        ('reveal focus', 'black', 'dark cyan', 'standout'),
-        ('body', 'black', 'light gray'),
-        ('flagged', 'black', 'dark green', ('bold','underline')),
-        ('focus', 'light gray', 'dark blue', 'standout'),
-        ('flagged focus', 'yellow', 'dark cyan',
-                ('bold','standout','underline')),
-        ('head', 'yellow', 'black', 'standout'),
-        ('foot', 'light gray', 'black'),
-        ('key', 'light cyan', 'black','underline'),
-        ('title', 'white', 'black', 'bold'),
-        ('dirmark', 'black', 'dark cyan', 'bold'),
-        ('flag', 'dark gray', 'light gray'),
-        ('error', 'dark red', 'light gray'),
-        ]
+    ('reveal focus', 'black', 'dark cyan', 'standout'),
+    ('body', 'black', 'light gray'),
+    ('flagged', 'black', 'dark green', ('bold', 'underline')),
+    ('focus', 'light gray', 'dark blue', 'standout'),
+    ('flagged focus', 'yellow', 'dark cyan',
+     ('bold', 'standout', 'underline')),
+    ('head', 'yellow', 'black', 'standout'),
+    ('foot', 'light gray', 'black'),
+    ('key', 'light cyan', 'black', 'underline'),
+    ('title', 'white', 'black', 'bold'),
+    ('dirmark', 'black', 'dark cyan', 'bold'),
+    ('flag', 'dark gray', 'light gray'),
+    ('error', 'dark red', 'light gray'),
+]
 
 
 class MainWidget(urwid.WidgetWrap):
     def __init__(self):
         self.content = urwid.SimpleListWalker([
-        # urwid.AttrMap(SelectableText('-- example_config.ymal ----'), 'asd',  'reveal focus'),
-        # urwid.AttrMap(SelectableText('bar'), '',  'reveal focus'),
-        # urwid.AttrMap(SelectableText('baz'), '',  'reveal focus'),
+            # urwid.AttrMap(SelectableText('-- example_config.ymal ----'), 'asd',  'reveal focus'),
+            # urwid.AttrMap(SelectableText('bar'), '',  'reveal focus'),
+            # urwid.AttrMap(SelectableText('baz'), '',  'reveal focus'),
         ])
 
         self.header_prefix = "Cluster Job Monitor v0.1"
@@ -56,7 +57,7 @@ class MainWidget(urwid.WidgetWrap):
         super(MainWidget, self).__init__(urwid.Frame(urwid.LineBox(self.list), header=self.header, footer=self.footer))
 
     def add_line(self, text: str, data):
-        self.content.append(urwid.AttrMap(SelectableText(text, data), '',  'reveal focus'))
+        self.content.append(urwid.AttrMap(SelectableText(text, data), '', 'reveal focus'))
 
     def get_job_line(self, job):
         return str(job['jobid']) + " " + str(job['status']['job_state'])
