@@ -105,8 +105,13 @@ def parseConfig(filename: str) -> list:
     make_list(config)  # Put everything into a list
     make_all_str(config)
 
-    logger.info("Generating configurations..")
+    # Check for before_script and after_script (Join to string so that combination generation works)
+    if 'before_script' in config:
+        config['before_script'] = ["\n".join(config['before_script'])]
+    if 'after_script' in config:
+        config['after_script'] = ["\n".join(config['after_script'])]
 
+    logger.info("Generating configurations..")
     job_configurations = list(gen_combinations(config))
 
     # Duplicate configs that have times set

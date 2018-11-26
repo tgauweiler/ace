@@ -56,8 +56,18 @@ def schedule(config: dict):
         prefix = "for run in {1.." + config['script']['times'] + "}\ndo\n\n\n"
         suffix = "done"
 
+    # Handle before_script
+    before_script = ''
+    if 'before_script' in config:
+        before_script = config['before_script']
+
+    # Handle after_script
+    after_script = ''
+    if 'after_script' in config:
+        after_script = config['after_script']
+
     # Join body
-    body = prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix + "\n"
+    body = before_script + "\n\n" + prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix + "\n\n" + after_script
 
     # Schedule job script
     config['jobid'] = job.run(body)
