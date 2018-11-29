@@ -1,1 +1,2 @@
 PyYAML==3.13
+coloredlogs==10.0
