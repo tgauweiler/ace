@@ -69,8 +69,7 @@ class Slurm(object):
                 k = "-" + k + " "
                 header.append("#SBATCH %s%s" % (k, v))
         self.header = "\n".join(header)
-        self.name = "".join(x for x in name.replace(
-            " ", "-") if x.isalnum() or x == "-")
+        self.name = "".join(x for x in name.replace(" ", "-") if x.isalnum() or x == "-")
         self.tmpl = tmpl
         self.slurm_kwargs = slurm_kwargs
         if scripts_dir is not None:
@@ -104,7 +103,8 @@ class Slurm(object):
         depends_on: job ids that this depends on before it is run (users 'afterok')
         """
         if name_addition is None:
-            name_addition = hashlib.sha1(command.encode("utf-8")).hexdigest()
+            name_addition = ""
+            # name_addition = hashlib.sha1(command.encode("utf-8")).hexdigest()
 
         if self.date_in_name:
             name_addition += "-" + str(datetime.date.today())
@@ -115,7 +115,7 @@ class Slurm(object):
 
         n = self.name
         self.name = self.name.strip(" -")
-        self.name += ("-" + name_addition.strip(" -"))
+        self.name += "-" + name_addition.strip(" -")
         args = []
         for k, v in cmd_kwargs.items():
             args.append("export %s=%s" % (k, v))
@@ -153,4 +153,5 @@ class Slurm(object):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
