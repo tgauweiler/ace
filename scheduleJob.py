@@ -2,6 +2,7 @@ import logging
 import os
 import socket
 from slurmpy import Slurm
+
 try:
     import pyslurm
 except ImportError:
@@ -27,7 +28,7 @@ def schedule(config: dict):
     # Create Slurm job script
     parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
 
-    job = Slurm("acb", parameters)
+    job = Slurm("ace", parameters)
 
     body = config['script']['body']
 
