@@ -33,7 +33,12 @@ def schedule(config: dict):
     if 'log-directory' in config['script']:
         log_directory = config['script']['log-directory']
 
-    job = Slurm("ace", parameters, log_directory=log_directory) 
+    # Check for job name
+    job_name = "ace"
+    if 'job-name' in config['scheduler']:
+        job_name = config['scheduler']['job-name']
+
+    job = Slurm(job_name, parameters, log_directory=log_directory) 
 
     body = config['script']['body']
 
