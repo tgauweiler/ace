@@ -33,8 +33,8 @@ import datetime
 TMPL = """\
 #!/bin/bash
 
-#SBATCH -e logs/{name}.%J.err
-#SBATCH -o logs/{name}.%J.out
+#SBATCH -e {log_directory}/{name}.%J.err
+#SBATCH -o {log_directory}/{name}.%J.out
 #SBATCH -J {name}
 
 {header}
@@ -50,11 +50,16 @@ def tmp(suffix=".sh"):
 
 
 class Slurm(object):
-    def __init__(self, name, slurm_kwargs=None, tmpl=None, date_in_name=True, scripts_dir="slurm-scripts/"):
+    def __init__(self, name, slurm_kwargs=None, tmpl=None, date_in_name=True, scripts_dir="slurm-scripts/", log_directory=None):
         if slurm_kwargs is None:
             slurm_kwargs = {}
         if tmpl is None:
             tmpl = TMPL
+        if log_directory is None:
+            self.log_directory = 'logs'
+        else:
+            self.log_directory = log_directory
+
 
         header = []
         for k, v in slurm_kwargs.items():
@@ -79,7 +84,7 @@ class Slurm(object):
         self.date_in_name = bool(date_in_name)
 
     def __str__(self):
-        return self.tmpl.format(name=self.name, header=self.header)
+        return self.tmpl.format(name=self.name, header=self.header, log_directory=self.log_directory)
 
     def _tmpfile(self):
         if self.scripts_dir is None:
@@ -125,8 +130,8 @@ class Slurm(object):
         if depends_on is None:
             depends_on = []
 
-        if "logs/" in tmpl and not os.path.exists("logs/"):
-            os.makedirs("logs")
+        if not os.path.exists(self.log_directory + '/'):
+            os.makedirs(self.log_directory)
 
         with open(self._tmpfile(), "w") as sh:
             sh.write(tmpl)

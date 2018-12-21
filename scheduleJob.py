@@ -28,7 +28,12 @@ def schedule(config: dict):
     # Create Slurm job script
     parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
 
-    job = Slurm("ace", parameters)
+    # Check if a log directory is set
+    log_directory = None
+    if 'log-directory' in config['script']:
+        log_directory = config['script']['log-directory']
+
+    job = Slurm("ace", parameters, log_directory=log_directory) 
 
     body = config['script']['body']
 

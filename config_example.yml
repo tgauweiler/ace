@@ -7,6 +7,7 @@ before_script:
 
 script: 
   times: 10
+  log-directory: "/scratch/tgauweil/logs"
   body: |
     msg="RUN: $run"
     echo $msg;
