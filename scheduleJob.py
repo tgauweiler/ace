@@ -63,7 +63,8 @@ def schedule(config: dict):
     env_vars.append("auto_args=\"" + " ".join(auto_args) + "\"")
 
     # Handle times keyword
-    if 'times' in config['script'] and int(config['script']['times']) > 1:
+    prefix=''
+    if 'times' in config['script']:
         prefix = "for run in {1.." + config['script']['times'] + "}\ndo\n\n\n"
         suffix = "done"
 
