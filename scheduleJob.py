@@ -12,8 +12,9 @@ logger = logging.getLogger('scheduleJob')
 
 
 def schedule(config: dict):
-    if config['scheduler']['type'].lower() != 'slurm':
-        logger.error("Only SLURM is supported at the moment!")
+    executer = config['scheduler']['type'].lower()
+    if executer not in ['slurm', 'bash']:
+        logger.error("Only SLURM or bash are supported at the moment!")
         raise RuntimeError("Unsupported Job Manager!")
 
     # If a host entry matches replace the found parameters
@@ -25,8 +26,11 @@ def schedule(config: dict):
             for k, v in config['scheduler']['host'][hostname]['parameters'].items():
                 config['scheduler']['parameters'][k] = v
 
-    # Create Slurm job script
-    parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
+    # Create Slurm job script, allow empty parameters
+    try:
+        parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
+    except KeyError:
+        parameters = {}
 
     # Check if a log directory is set
     log_directory = None
@@ -82,7 +86,10 @@ def schedule(config: dict):
     body = before_script + "\n\n" + prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix + "\n\n" + after_script
 
     # Schedule job script
-    config['jobid'] = job.run(body)
+    if executer == 'bash':
+        config['jobid'] = job.run(body, _cmd='bash')
+    else:
+        config['jobid'] = job.run(body)
 
 
 def get_job_info(config: dict):

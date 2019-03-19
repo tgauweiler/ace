@@ -1,0 +1,15 @@
+script: 
+  times: 10
+
+  body: |
+    msg="RUN: $run"
+    echo $msg >> test.log
+
+    echo ${auto_args} >> test.log
+
+  parameters:
+    seedSet: [1,3]
+
+
+scheduler:
+  type: bash

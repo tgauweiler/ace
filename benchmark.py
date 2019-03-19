@@ -62,8 +62,8 @@ class Benchmark(object):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run benchmark for config.yml")
-    parser.add_argument('config_file', metavar='file', type=str,
-                        help='path to config file')
+    parser.add_argument('config_file', metavar='file', type=str, help='Path to config file')
+
     args = parser.parse_args()
     bench = Benchmark(args.config_file)
     
@@ -73,6 +73,6 @@ if __name__ == "__main__":
         scheduleJob.schedule(config)
         print('.', end='', flush=True)
         time.sleep(0.5)
-    print("")  # So that shell start correct
+    print("")  # So that shell starts correctly after termination
 
 
