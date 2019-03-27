@@ -4,7 +4,7 @@ script:
   body: |
     msg="RUN: $run"
     echo $msg >> test.log
-
+    echo $jobId >> test.log
     echo ${auto_args} >> test.log
 
   parameters:

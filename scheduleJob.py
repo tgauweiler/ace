@@ -11,7 +11,7 @@ except ImportError:
 logger = logging.getLogger('scheduleJob')
 
 
-def schedule(config: dict):
+def schedule(config: dict, name_addition: str = None):
     executer = config['scheduler']['type'].lower()
     if executer not in ['slurm', 'bash']:
         logger.error("Only SLURM or bash are supported at the moment!")
@@ -28,7 +28,8 @@ def schedule(config: dict):
 
     # Create Slurm job script, allow empty parameters
     try:
-        parameters = {i: config['scheduler']['parameters'][i] for i in config['scheduler']['parameters']}
+        parameters = {i: config['scheduler']['parameters'][i]
+                      for i in config['scheduler']['parameters']}
     except KeyError:
         parameters = {}
 
@@ -42,12 +43,16 @@ def schedule(config: dict):
     if 'job-name' in config['scheduler']:
         job_name = config['scheduler']['job-name']
 
-    job = Slurm(job_name, parameters, log_directory=log_directory) 
+    job = Slurm(job_name, parameters, log_directory=log_directory)
 
     body = config['script']['body']
 
     env_vars = []
     auto_args = []
+
+    # Add evn var with job id
+    env_vars.append("jobId=" + name_addition)
+
     for k, v in config['script']['parameters'].items():
         # Check if variable already set
         if k in os.environ:
@@ -67,7 +72,7 @@ def schedule(config: dict):
     env_vars.append("auto_args=\"" + " ".join(auto_args) + "\"")
 
     # Handle times keyword
-    prefix=''
+    prefix = ''
     if 'times' in config['script']:
         prefix = "for run in {1.." + config['script']['times'] + "}\ndo\n\n\n"
         suffix = "done"
@@ -83,13 +88,16 @@ def schedule(config: dict):
         after_script = config['after_script']
 
     # Join body
-    body = before_script + "\n\n" + prefix + "\n".join(env_vars) + "\n\n\n" + body + "\n\n\n" + suffix + "\n\n" + after_script
+    body = before_script + "\n\n" + prefix + \
+        "\n".join(env_vars) + "\n\n\n" + body + \
+        "\n\n\n" + suffix + "\n\n" + after_script
 
     # Schedule job script
     if executer == 'bash':
-        config['jobid'] = job.run(body, _cmd='bash')
+        config['jobid'] = job.run(
+            body, _cmd='bash', name_addition=name_addition)
     else:
-        config['jobid'] = job.run(body)
+        config['jobid'] = job.run(body, name_addition=name_addition)
 
 
 def get_job_info(config: dict):

@@ -44,10 +44,14 @@ class Benchmark(object):
                             if 'time' in job['scheduler'] and 'retry-time' in job['scheduler']:
                                 # Add retry time to time and rerun job
                                 (h, m, s) = job['scheduler']['time'].split(':')
-                                d = datetime.timedelta(hours=int(h), minutes=int(m), seconds=int(s))
+                                d = datetime.timedelta(
+                                    hours=int(h), minutes=int(m), seconds=int(s))
 
-                                (h, m, s) = job['scheduler']['retry-time'].split(':')
-                                d = d + datetime.timedelta(hours=int(h), minutes=int(m), seconds=int(s))
+                                (h, m,
+                                 s) = job['scheduler']['retry-time'].split(':')
+                                d = d + \
+                                    datetime.timedelta(
+                                        hours=int(h), minutes=int(m), seconds=int(s))
 
                                 job['scheduler']['time'] = str(d)
                                 scheduleJob.schedule(job)
@@ -57,22 +61,23 @@ class Benchmark(object):
                         count = int(job['scheduler']['retry-count'])
                         if count > 0:
                             job['scheduler']['retry-count'] = str(count-1)
-                            scheduleJob.schedule(job)  # Maybe create new config so that failed job stays as gui line?
+                            # Maybe create new config so that failed job stays as gui line?
+                            scheduleJob.schedule(job)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run benchmark for config.yml")
-    parser.add_argument('config_file', metavar='file', type=str, help='Path to config file')
+    parser = argparse.ArgumentParser(
+        description="Run benchmark for config.yml")
+    parser.add_argument('config_file', metavar='file',
+                        type=str, help='Path to config file')
 
     args = parser.parse_args()
     bench = Benchmark(args.config_file)
-    
+
     logger.info("Run benchmark? (ctrl-c to abort)")
     input("")
-    for config in bench.configurations:
-        scheduleJob.schedule(config)
+    for i, config in enumerate(bench.configurations):
+        scheduleJob.schedule(config, str(i))
         print('.', end='', flush=True)
         time.sleep(0.5)
     print("")  # So that shell starts correctly after termination
-
-
