@@ -1,8 +1,19 @@
 import yaml
 
+"""
+This file handles the configuration file loading and parsing
+"""
 
-# Result is saved in main
+
 def merge_dicts(main: dict, second: dict):
+    """
+    Merges two dicts into main
+
+    Args:
+        main (dict): The target dict
+        second (dict): The dict to be added to main
+    """
+
     for key, value in second.items():
         if key in main and type(value) is dict:
             merge_dicts(main[key], value)
@@ -11,6 +22,16 @@ def merge_dicts(main: dict, second: dict):
 
 
 def load(filename: str) -> dict:
+    """
+    Loads a configuration file and parses
+
+    Args:
+        filename (str): Path to file
+
+    Returns:
+        dict: Parsed yaml
+    """
+
     include_configs = dict()
     with open(filename, 'r') as f:
         for line in f:

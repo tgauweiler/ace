@@ -10,8 +10,23 @@ except ImportError:
 
 logger = logging.getLogger('scheduleJob')
 
+"""
+This file contains the logic to schedule and monitor one configuration as a job
+"""
+
 
 def schedule(config: dict, name_addition: str = None):
+    """
+    Schedules a given configuration as a new job
+
+    Args:
+        config (dict): job configuration
+        name_addition (str, optional): Defaults to None. Addition to the job name
+
+    Raises:
+        RuntimeError: When requested scheduler is not available
+    """
+
     executer = config['scheduler']['type'].lower()
     if executer not in ['slurm', 'bash']:
         logger.error("Only SLURM or bash are supported at the moment!")
@@ -101,6 +116,13 @@ def schedule(config: dict, name_addition: str = None):
 
 
 def get_job_info(config: dict):
+    """
+    Gets runtime information of a running SLURM job
+
+    Args:
+        config (dict): A job configuration
+    """
+
     if pyslurm and 'jobid' in config:
         job = pyslurm.job()
         config['status'] = job.find_id(config['jobid'])[0]
