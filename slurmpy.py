@@ -60,7 +60,6 @@ class Slurm(object):
         else:
             self.log_directory = log_directory
 
-
         header = []
         for k, v in slurm_kwargs.items():
             if len(k) > 1:
@@ -74,7 +73,8 @@ class Slurm(object):
                 k = "-" + k + " "
                 header.append("#SBATCH %s%s" % (k, v))
         self.header = "\n".join(header)
-        self.name = "".join(x for x in name.replace(" ", "-") if x.isalnum() or x == "-")
+        self.name = "".join(x for x in name.replace(
+            " ", "-") if x.isalnum() or x == "-")
         self.tmpl = tmpl
         self.slurm_kwargs = slurm_kwargs
         if scripts_dir is not None:
