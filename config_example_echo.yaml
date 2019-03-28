@@ -1,6 +1,7 @@
 #include config_base.yaml
 
 script:
+  log-directory: "/scratch/tgauweil/logs"
   body: |
          echo ${auto_args}
 
@@ -17,13 +18,10 @@ script:
 
 scheduler:
   type: slurm
-  retry: true
-  retry-time: 00:30:00
-  retry-count: 2
 
   parameters:
     account: "tukl-taskvis"
-    constraint: "XEON_E5_2640v3,IB"
+    partition: "skylake-96"
     ntasks-per-node: 1
     cpus-per-task: 16
     mem: 1G

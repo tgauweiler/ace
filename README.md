@@ -10,6 +10,7 @@ One usage is for example benchmarking code on a SLURM cluster with different run
 ```
 git clone https://github.com/tgauweiler/ace.git
 cd ace
+easy_install-3.4 --user pip (Only if no pip3 is available)
 pip3 install --user -r requirements.txt
 ```
 

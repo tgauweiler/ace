@@ -45,13 +45,11 @@ after_script:
 scheduler:
   type: slurm
   job-name: "Vampirtrace"
-  retry: true
-  retry-time: 00:30:00
-  retry-count: 2
-  host:
+
+  host: # Change parameters based on hostname
     'elwe':
       parameters:
-        constraint: "XEON_E5_2640v3,IB"
+        partition: "skylake-96"
     'minion':
       parameters:
         nodes: [1, 2, 3, 4, 5]
