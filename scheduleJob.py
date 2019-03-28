@@ -88,6 +88,7 @@ def schedule(config: dict, name_addition: str = None):
 
     # Handle times keyword
     prefix = ''
+    suffix = ''
     if 'times' in config['script']:
         prefix = "for run in {1.." + config['script']['times'] + "}\ndo\n\n\n"
         suffix = "done"
